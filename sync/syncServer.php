@@ -63,12 +63,6 @@ function removeBackfiredChanges(& $serverChanges, $clientChanges) {
    }
 }
 
-function syncGetVersionBis($db) {
-   $query = "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10);";
-   $stmt = $db->query($query);
-   return $stmt->fetchColumn();
-}
-
 function syncWithClient($db, $clientChanges, $minServerVersion, $requests, $roles, $params) {
    global $tablesModels, $startTime, $config;
    $useTransaction = true;
@@ -98,7 +92,7 @@ function syncWithClient($db, $clientChanges, $minServerVersion, $requests, $role
    // Listeners and triggers may also generate new changes that need to be sent to the client.
    
    // We save the current version, which will be used as the next minVersion when the same client synchronizes in the future. 
-   $curVersion = syncGetVersionBis($db);
+   $curVersion = syncGetVersion($db);
 
    $bsearchTimes = array();
    $maxVersion = $curVersion;
