@@ -46,12 +46,14 @@ var TreeView = Class.extend({
          syncStarted: function() {
             var tree = $("#" + that.name).dynatree("getTree");
             tree.enableUpdate(false);
+            that.willFillStaticData = true;
             SyncQueue.removeSyncStartListeners(that.name);
          },
 
          syncEnded: function() {
             var tree = $("#" + that.name).dynatree("getTree");
             that.fillWithStaticData();
+            that.willFillStaticData = false;
             tree.enableUpdate(true);
             SyncQueue.removeSyncEndListeners(that.name);
          },
@@ -77,7 +79,8 @@ var TreeView = Class.extend({
          // il faut mettre à jour toutes les occurences du noeud racine dans l'arbre
          // ce sont tous les relations qui ont pour fils la racine.
          // pb : il n'y en a aucun
-         relationInserted: function(relation) {
+         relationInserted: function(relation, doingStaticData) {
+            if (that.willFillStaticData && !doingStaticData) return;
             if ((that.isVisibleObject && (!that.isVisibleObject(relation[that.childFieldName]))) ||
                (that.isVisibleRelation && (!that.isVisibleRelation(relation)))) {
                return;
@@ -154,7 +157,8 @@ var TreeView = Class.extend({
             that.triggers.objectUpdated(relation[that.childFieldName]);
          },
 
-         objectUpdated: function(object) {
+         objectUpdated: function(object, doingStaticData) {
+            if (that.willFillStaticData && !doingStaticData) return;
             if (that.isObjectRoot(object)) {
                return;
             }
@@ -201,15 +205,15 @@ var TreeView = Class.extend({
             }
          },
 
-         objectStringsUpdated: function(objectString) {
-            that.triggers.objectUpdated(objectString[that.objectFieldName]);
+         objectStringsUpdated: function(objectString, doingStaticData) {
+            that.triggers.objectUpdated(objectString[that.objectFieldName], doingStaticData);
          }
       };
 
       this.fillWithStaticData = function() {
          var records = ModelsManager.getRecords(that.relationsModelName);
          $.each(records, function(ID, record) {
-            that.triggers.relationInserted(record);
+            that.triggers.relationInserted(record, true);
          });
          /*records = ModelsManager.getRecords(that.objectsModelName);
          $.each(records, function(ID, record) {
@@ -218,7 +222,7 @@ var TreeView = Class.extend({
          if (that.objectsStringsModelName) {
             records = ModelsManager.getRecords(that.objectsStringsModelName);
             $.each(records, function(ID, record) {
-               that.triggers.objectStringsUpdated(record);
+               that.triggers.objectStringsUpdated(record, true);
             });
          }
       };
