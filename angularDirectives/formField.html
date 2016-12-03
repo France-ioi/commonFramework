@@ -1,60 +1,73 @@
-<div ng-switch="field.widget" class="form-group" style="clear:both">
-   <span ng-switch-when="radio">
-      <b>{{ field.label }}</b><br/>
-      <div ng-if="!readonly" ng-repeat="(value, data) in field.values" class="radio">
+<div ng-switch="field.widget" style="clear:both">
+   <div ng-switch-when="radio-buttons" class="form-group row">
+      <span class="control-label col-xs-4">{{ field.label }}&nbsp;:</span>
+      <div ng-if="!readonly" class="btn-group col-xs-8">
+        <label ng-repeat="(value, data) in field.values" ng-model="$parent.model[$parent.fieldname]" uib-btn-radio="'{{value}}'" class="btn btn-default"><span ng-bind-html="data.label"></span></label>
+      </div>
+      <span ng-if="readonly" class="col-xs-8"><span ng-bind-html="field.values[model[fieldname]].label"></span></span>
+   </div>
+
+   <div ng-switch-when="radio" class="form-group row">
+      <span class="control-label col-xs-12">{{ field.label }}&nbsp;:&nbsp;</span>
+      <div ng-if="!readonly" ng-repeat="(value, data) in field.values" class="col-xs-12">
         <label>
           <input type="radio" ng-model="$parent.model[$parent.fieldname]" value="{{value}}">
-          <span ng-bind-html="data.label"></span>
+          <span ng-bind-html="data.label" class="radio-label"></span>
         </label>
       </div>
-      <span ng-if="readonly"> : <span ng-bind-html="field.values[model[fieldname]].label"></span></span>
-   </span>
-   <span ng-switch-default>
-      <span ng-switch="field.type">
+      <span ng-if="readonly"><span ng-bind-html="field.values[model[fieldname]].label"></span></span>
+   </div>
 
-         <span ng-switch-default> <!-- string, key, int, float -->
-            <label class="control-label col-xs-4">{{ field.label }} :</label>
+   <div ng-switch-default>
+      <div ng-switch="field.type">
+
+         <div ng-switch-default class="form-group row"> <!-- string, key, int, float -->
+            <label class="control-label col-xs-4">{{ field.label }}&nbsp;:</label>
             <div class="col-xs-8">
               <input type="text" ng-model="model[fieldname]" class="form-control">
             </div>
-         </span>
+         </div>
 
-         <span ng-switch-when="text">
-            <label class="control-label col-xs-4">{{ field.label }} :</label>
+         <div ng-switch-when="text" class="form-group row">
+            <label class="control-label col-xs-4">{{ field.label }}&nbsp;:</label>
             <div class="col-xs-8">
               <textarea class="form-control" rows="5" ng-model="model[fieldname]"></textarea>
             </div>
-         </span>
+         </div>
 
-         <span ng-switch-when="boolean">
-            <label class="checkbox col-xs-8 col-xs-offset-4">
-              <input type="checkbox" ng-model="model[fieldname]"> {{field.label }}
-            </label>
-         </span>
+         <div ng-switch-when="boolean" class="form-group row">
+            <span class="control-label col-xs-4">{{field.label}}&nbsp;:&nbsp;</span>
+            <div class="checkboxSwitch col-xs-8">
+               <input type="checkbox" id="item_{{$id}}" class="switch" ng-model="model[fieldname]">
+               <label for="item_{{$id}}"><span></span></label>
+            </div>
+         </div>
 
-         <span ng-switch-when="point">
-            <label class="control-label col-xs-4">{{ field.label }} :</label>
-            <div class="col-xs-3">
-              <input type="text" ng-model="model[fieldname].x" class="form-control">
+         <div ng-switch-when="point" class="form-group">
+            <div class="row">
+               <label class="control-label col-xs-4">{{ field.label }} :</label>
+               <div class="col-xs-3">
+                  <input type="text" ng-model="model[fieldname].x" class="form-control">
+               </div>
+               <div class="col-xs-3">
+                  <input type="text" ng-model="model[fieldname].y" class="form-control">
+               </div>
+               <div class="col-xs-2">
+                 <button type="button" class="btn btn-default btn-block" ng-click="map.display = !map.display">Carte
+                 </button>
+               </div>
             </div>
-            <div class="col-xs-3">
-              <input type="text" ng-model="model[fieldname].y" class="form-control">
+            <div ng-if="map.display" class="row">
+               <div class="col-xs-8 col-xs-offset-4">
+                  <a href="" ng-click="map.geocoder()">Déduire les coordonnées de l'adresse</a>
+               </div>
+               <google-map center="map.center" zoom="map.zoom" draggable="true" events="map.events">
+                  <marker coords="[model[fieldname].y, model[fieldname].x]" ng-if="model[fieldname].x"></marker>
+               </google-map>
             </div>
-            <div class="col-xs-2">
-              <button type="button" class="btn btn-default btn-block" ng-click="map.display = !map.display">Carte
-              </button>
-            </div>
-           <div ng-if="map.display">
-             <div class="col-xs-8 col-xs-offset-4">
-               <a href="" ng-click="map.geocoder()">Déduire les coordonnées de l'adresse</a>
-             </div>
-             <google-map center="map.center" zoom="map.zoom" draggable="true" events="map.events">
-               <marker coords="[model[fieldname].y, model[fieldname].x]" ng-if="model[fieldname].x"></marker>
-             </google-map>
-           </div>
-         </span>
+         </div>
 
-         <span ng-switch-when="jsdatetime">
+         <div ng-switch-when="jsdatetime" class="form-group row">
             <label class="control-label col-xs-4">{{ field.label }} : </label>
             <div class="col-xs-3">
               <p class="input-group">
@@ -71,16 +84,16 @@
             <div class="col-xs-2">
               <button class="btn btn-danger" ng-click="clear()">Jamais</button>
             </div>
-         </span>
+         </div>
 
-         <span ng-switch-when="jstime">
+         <div ng-switch-when="jstime" class="form-group row">
             <label class="control-label col-xs-4">{{ field.label }} :</label>
             <div class="col-xs-8">
               <timepicker ng-model="model[fieldname]"></timepicker>
             </div>
-         </span>
+         </div>
 
-         <span ng-switch-when="jsdate">
+         <div ng-switch-when="jsdate" class="form-group row">
             <label class="control-label col-xs-4">{{ field.label }}</label>
             <div class="col-xs-5">
               <p class="input-group">
@@ -94,9 +107,9 @@
             <div class="col-xs-3">
               <button class="btn btn-danger" ng-click="clear()">Jamais</button>
             </div>
-         </span>
+         </div>
 
-         <span ng-switch-when="enum">
+         <div ng-switch-when="enum" class="form-group row">
             <label class="control-label col-xs-4">{{ field.label }} :</label>
             <div class="col-xs-8">
               <select ng-if="!readonly" ui-select2="select2Options" ng-model="model[fieldname]" class="form-control"
@@ -108,7 +121,8 @@
                       <!--ng-options="key as value.label for (key, value) in field.values"/>-->
               <span ng-if="readonly" ng-bind-html="field.values[model[fieldname]].label"></span>
             </div>
-         </span>
-      </span>
-   </span>
+
+         </div>
+      </div>
+   </div>
 </div>
