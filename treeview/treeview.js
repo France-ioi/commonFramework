@@ -410,6 +410,7 @@ var TreeView = Class.extend({
       newRelation[this.idParentFieldName] = targetRelation[this.childFieldName].ID;
       newRelation[this.iChildOrderFieldName] = this.firstAvailableOrder(targetRelation[this.childFieldName]);
       ModelsManager.insertRecord(this.relationsModelName, newRelation);
+      alert("Vous avez déplacé/copié un item, les paramètres d'accès ont été remis à zéro. Veuillez les vérifier dans le panneau 'Accès et validation'.");
    },
 
    cleanupOrders: function(parentObject) {
@@ -488,34 +489,52 @@ var TreeView = Class.extend({
       console.error(res);
    },
 
-   addObjectToTargetNode: function(object, targetNode, hitMode) {
-      var targetRelation = ModelsManager.getRecord(this.relationsModelName, targetNode.data.idRelation);
-      var newRelation = ModelsManager.createRecord(this.relationsModelName);
-      newRelation[this.idChildFieldName] = object.ID;
-      if (hitMode === "over") {
-         newRelation[this.idParentFieldName] = targetRelation[this.childFieldName].ID;
-         //this.cleanupOrders(targetRelation[this.childFieldName]);
-         newRelation[this.iChildOrderFieldName] = this.firstAvailableOrder(targetRelation[this.childFieldName]);
-      } else {
-         newRelation[this.idParentFieldName] = targetRelation[this.parentFieldName].ID;
-         var iChildOrder = targetRelation[this.iChildOrderFieldName];
-         if (hitMode == "after") {
-            iChildOrder++;
+   addObjectToTargetNode: function(object, targetRelation, hitMode, relation) {
+      if(relation && relation[this.parentFieldName].ID === targetRelation[this.parentFieldName].ID) {
+         if (hitMode === "over") {
+            relation[this.iChildOrderFieldName] = this.firstAvailableOrder(targetRelation[this.childFieldName]);
+         } else {
+            var iChildOrder = targetRelation[this.iChildOrderFieldName];
+            if (hitMode == "after") {
+               iChildOrder++;
+            }
+            this.changeChildrenOrderBetween(targetRelation[this.parentFieldName], 1, iChildOrder);
+            relation[this.iChildOrderFieldName] = iChildOrder;
          }
-         this.changeChildrenOrderBetween(targetRelation[this.parentFieldName], 1, iChildOrder);
-         newRelation[this.iChildOrderFieldName] = iChildOrder;
+         ModelsManager.updated(this.relationsModelName, relation.ID);
+         if (this.relationCreated != undefined) {
+            this.relationCreated(relation);
+         }
+      } else {
+         var newRelation = ModelsManager.createRecord(this.relationsModelName);
+         newRelation[this.idChildFieldName] = object.ID;
+         if (hitMode === "over") {
+            newRelation[this.idParentFieldName] = targetRelation[this.childFieldName].ID;
+            //this.cleanupOrders(targetRelation[this.childFieldName]);
+            newRelation[this.iChildOrderFieldName] = this.firstAvailableOrder(targetRelation[this.childFieldName]);
+         } else {
+            newRelation[this.idParentFieldName] = targetRelation[this.parentFieldName].ID;
+            var iChildOrder = targetRelation[this.iChildOrderFieldName];
+            if (hitMode == "after") {
+               iChildOrder++;
+            }
+            this.changeChildrenOrderBetween(targetRelation[this.parentFieldName], 1, iChildOrder);
+            newRelation[this.iChildOrderFieldName] = iChildOrder;
+         }
+         if (this.relationCreated != undefined) {
+            this.relationCreated(newRelation);
+         }
+         ModelsManager.insertRecord(this.relationsModelName, newRelation);
+         alert("Vous avez déplacé/copié un item, les paramètres d'accès ont été remis à zéro. Veuillez les vérifier dans le panneau 'Accès et validation'.");
       }
-      if (this.relationCreated != undefined) {
-         this.relationCreated(newRelation);
-      }
-      ModelsManager.insertRecord(this.relationsModelName, newRelation);
    },
 
    dropObject: function(targetNode, sourceNode, hitMode, action) {
       //logMsg("tree.onDrop(%o, %o, %s)", node, sourceNode, hitMode);
       var relation = ModelsManager.getRecord(this.relationsModelName, sourceNode.data.idRelation);
-      this.addObjectToTargetNode(relation[this.childFieldName], targetNode, hitMode);
-      if (action == "drop_move") {
+      var targetRelation = ModelsManager.getRecord(this.relationsModelName, targetNode.data.idRelation);
+      this.addObjectToTargetNode(relation[this.childFieldName], targetRelation, hitMode, relation);
+      if (action == "drop_move" && relation[this.parentFieldName].ID !== targetRelation[this.parentFieldName].ID) {
          this.doDeleteRelation(relation);
       }
       return true;
@@ -660,7 +679,8 @@ var TreeView = Class.extend({
                if (sourceNode.data.idObject != undefined) {
                   var object = ModelsManager.getRecord(that.objectsModelName, sourceNode.data.idObject);
                   setTimeout(function() {
-                     that.addObjectToTargetNode(object, targetNode, hitMode);
+                     var targetRelation = ModelsManager.getRecord(that.relationsModelName, targetNode.data.idRelation);
+                     that.addObjectToTargetNode(object, targetRelation, hitMode);
                   }, 100);
                   return;
                }
