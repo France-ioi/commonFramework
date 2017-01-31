@@ -308,7 +308,7 @@ window.ModelsManager = {
             index = link.index;
          }
          var oldIndex = oldRecord[index];
-         if ((oldValue != null) && (oldIndex != null)) {
+         if ((oldValue != null) && (oldIndex != null) && this.curData[field.refModel][oldValue]) {
             var refRecordLink = this.curData[field.refModel][oldValue][field.invLink];
             this.deleteLinkFromRefRecordByIndex(link, refRecordLink, oldIndex, oldRecord[primaryKey]);
          }
