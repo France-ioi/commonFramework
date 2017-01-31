@@ -14,11 +14,14 @@ function syncWithServer($db, $serverUrl, $requests) {
       // So we detect changes before we apply any server changes.
       // This means this HAS to be run within a transaction, so that no changes are ignored
 
-      syncIncrementVersion($db);
-      $curVersions = syncGetVersions($db);
+      // TODO :: this client is very probably not up-to-date
 
-      $minVersion = $curVersions->iLastClientVersion;
-      $maxVersion = $curVersions->iVersion;
+//      syncIncrementVersion($db);
+
+      $curVersion = syncGetVersions($db);
+      $minVersion = 0; // TODO :: ???
+      $maxVersion = $curVersion;
+
       $clientChanges = syncGetChanges($db, $requests, $minVersion, $maxVersion, 1000000, true);
       $clientData = array("changes" => json_encode($clientChanges), "minServerVersion" => $curVersions->iLastServerVersion, "params" => $config->sync->params);
       $serverResponse = httpPost($serverUrl, $clientData);
@@ -28,7 +31,7 @@ function syncWithServer($db, $serverUrl, $requests) {
           throw new Exception("Invalid server answer");
       }
       syncApplyChanges($db, $requests, $serverData->changes, array("admin"));
-      syncIncrementVersion($db);
+//      syncIncrementVersion($db);
       syncUpdateVersions($db, $serverData->serverVersion);
       $db->exec("COMMIT");
    } catch (Exception $e) {
