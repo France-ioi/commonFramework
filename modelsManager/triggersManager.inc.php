@@ -24,7 +24,8 @@ class TriggerManager {
             $listFieldsNewValues[] = "NEW.`".$fieldName."`";
             $listFieldsOldValues[] = "OLD.`".$fieldName."`";
          }
-         $triggers[$tableName]["BEFORE INSERT"][] = "SELECT `iVersion` INTO @curVersion FROM `synchro_version`;".
+
+         $triggers[$tableName]["BEFORE INSERT"][] = "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10) INTO @curVersion;".
                                                   "SET NEW.iVersion = @curVersion";
 
          $triggers[$tableName]["AFTER INSERT"][] = "INSERT INTO `history_".$tableName."` (".implode(",", $listFields).") VALUES (".implode(",", $listFieldsNewValues).")";
@@ -33,11 +34,7 @@ class TriggerManager {
             "IF NEW.iVersion <> OLD.iVersion THEN ".
                "SET @curVersion = NEW.iVersion; ".
             "ELSE ".
-               "SELECT `iVersion` INTO @curVersion FROM `synchro_version`; ".
-               "IF @curVersion = OLD.iVersion THEN ".
-                  "UPDATE `synchro_version` SET `iVersion` = `iVersion` + 1; ".
-                  "SET @curVersion = @curVersion + 1; ".
-               "END IF; ".
+               "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10) INTO @curVersion; ".
             "END IF; ".
             "IF NOT (".$conditions.") THEN ".
             "  SET NEW.iVersion = @curVersion; ".
@@ -47,7 +44,7 @@ class TriggerManager {
             "; END IF";
 
          $triggers[$tableName]["BEFORE DELETE"][] =
-                  "SELECT `iVersion` INTO @curVersion FROM `synchro_version`; ".
+                  "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10) INTO @curVersion; ".
                   "UPDATE `history_".$tableName."` SET `iNextVersion` = @curVersion WHERE `".$idField."` = OLD.`".$idField."` AND `iNextVersion` IS NULL; ".
                   "INSERT INTO `history_".$tableName."` (".implode(",", $listFields).", `bDeleted`) ".
                      "VALUES (".implode(",", $listFieldsOldValues).", 1)";

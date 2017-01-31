@@ -8,9 +8,13 @@ var TreeView = Class.extend({
       this.currentKey = 0;
       this.name = name;
       this.staticData = (typeof params.staticData === 'undefined') ? false : params.staticData;
+      this.clickFolderMode = (typeof params.clickFolderMode === 'undefined') ? 1 : params.clickFolderMode;
+      this.selectMode = (typeof params.selectMode === 'undefined') ? 1 : params.selectMode;
       this.readOnly = (typeof params.readOnly === 'undefined') ? false : params.readOnly;
       this.displayUnused = (typeof params.displayUnused === 'undefined') ? true : params.displayUnused;
       this.checkUserRight = (typeof params.checkUserRight === 'undefined') ? function(){return true;} : params.checkUserRight;
+      this.onQuerySelect = (typeof params.onQuerySelect === 'undefined') ? null : params.onQuerySelect;
+      this.onQueryActivate = (typeof params.onQueryActivate === 'undefined') ? null : params.onQueryActivate;
       this.objectsModelName = params.objectsModelName;
       this.objectsStringsModelName = params.objectsStringsModelName;
       this.objectFieldName = params.objectFieldName;
@@ -632,21 +636,29 @@ var TreeView = Class.extend({
       SyncQueue.removeSyncEndListeners(this.name);
    },
 
+   addListeners: function() {
+      SyncQueue.addSyncStartListeners(this.name, this.triggers.syncStarted);
+      SyncQueue.addSyncEndListeners(this.name, this.triggers.syncEnded);
+      ModelsManager.addListener(this.relationsModelName, "inserted", this.name, this.triggers.relationInserted, true);
+      ModelsManager.addListener(this.relationsModelName, "updated", this.name, this.triggers.relationUpdated, true);
+      ModelsManager.addListener(this.relationsModelName, "deleted", this.name, this.triggers.relationDeleted, true);
+      ModelsManager.addListener(this.objectsModelName, "updated", this.name, this.triggers.objectUpdated, true);
+      ModelsManager.addListener(this.objectsModelName, "inserted", this.name, this.triggers.objectUpdated, true);
+      if (this.objectsStringsModelName != null) {
+         ModelsManager.addListener(this.objectsStringsModelName, "inserted", this.name, this.triggers.objectStringsUpdated, true);
+         ModelsManager.addListener(this.objectsStringsModelName, "updated", this.name, this.triggers.objectStringsUpdated, true);
+      }
+   },
+ 
    fillTree: function() {
       if (!this.staticData) {
-         SyncQueue.addSyncStartListeners(this.name, this.triggers.syncStarted);
-         SyncQueue.addSyncEndListeners(this.name, this.triggers.syncEnded);
-         ModelsManager.addListener(this.relationsModelName, "inserted", this.name, this.triggers.relationInserted, true);
-         ModelsManager.addListener(this.relationsModelName, "updated", this.name, this.triggers.relationUpdated, true);
-         ModelsManager.addListener(this.relationsModelName, "deleted", this.name, this.triggers.relationDeleted, true);
-         ModelsManager.addListener(this.objectsModelName, "updated", this.name, this.triggers.objectUpdated, true);
-         ModelsManager.addListener(this.objectsModelName, "inserted", this.name, this.triggers.objectUpdated, true);
-         if (this.objectsStringsModelName != null) {
-            ModelsManager.addListener(this.objectsStringsModelName, "inserted", this.name, this.triggers.objectStringsUpdated, true);
-            ModelsManager.addListener(this.objectsStringsModelName, "updated", this.name, this.triggers.objectStringsUpdated, true);
-         }
+         this.addListeners();
       } else {
-         SyncQueue.addSyncEndListeners(this.name, this.triggers.syncEnded);
+         var self = this;
+         SyncQueue.addSyncEndListeners(this.name, function() {
+            self.triggers.syncEnded();
+            self.addListeners();
+         });
       }
       var children = [];
       var unusedFolder = this.getUnusedFolder();
@@ -655,7 +667,10 @@ var TreeView = Class.extend({
       }
       var that = this;
       $("#" + this.name).dynatree({
-         clickFolderMode: 1, // 1:activate, 2:expand, 3:activate and expand
+         clickFolderMode: that.clickFolderMode, // 1:activate, 2:expand, 3:activate and expand
+         selectMode: that.selectMode,
+         onQueryActivate: that.onQueryActivate,
+         onQuerySelect: that.onQuerySelect,
          onActivate: function(node) {
             that.selectNode(node);
          },

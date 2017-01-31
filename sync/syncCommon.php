@@ -11,6 +11,17 @@ if (file_exists( __DIR__."/../../shared/debug.php")) {
    function syncDebug($type, $b_or_e, $subtype='') {}
 }
 
+function syncUpdateVersions($db, $lastServerVersion) {
+   $query = "UPDATE `synchro_version` SET `iLastServerVersion` = :lastServerVersion, `iLastClientVersion` = `iVersion`";
+   $stmt = $db->prepare($query);
+   $stmt->execute(array("lastServerVersion" => $lastServerVersion));
+}
+
+function syncGetVersions($db) {
+   $query = "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10);";
+   $stmt = $db->query($query);
+   return $stmt->fetchColumn();
+}
 
 if(!function_exists('array_utf8')) {
     function array_utf8($data) {
@@ -44,23 +55,6 @@ if(!function_exists('json_encode_safe')) {
         }
         return $result;
     }
-}
-
-function syncUpdateVersions($db, $lastServerVersion) {
-   $query = "UPDATE `synchro_version` SET `iLastServerVersion` = :lastServerVersion, `iLastClientVersion` = `iVersion`";
-   $stmt = $db->prepare($query);
-   $stmt->execute(array("lastServerVersion" => $lastServerVersion));
-}
-
-function syncGetVersions($db) {
-   $query = "SELECT * FROM `synchro_version`";
-   $stmt = $db->query($query);
-   return $stmt->fetchObject();
-}
-
-function syncIncrementVersion($db) {
-   $query = "UPDATE `synchro_version` SET `iVersion` = `iVersion` + 1";
-   $db->exec($query);
 }
 
 function createViewModelFromTable($tableName) {
