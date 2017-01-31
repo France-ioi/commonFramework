@@ -92,7 +92,7 @@ function syncWithClient($db, $clientChanges, $minServerVersion, $requests, $role
    // Listeners and triggers may also generate new changes that need to be sent to the client.
    
    // We save the current version, which will be used as the next minVersion when the same client synchronizes in the future. 
-   $curVersion = syncGetVersions($db);
+   $curVersion = syncGetVersion($db);
 
    $bsearchTimes = array();
    $maxVersion = $curVersion;

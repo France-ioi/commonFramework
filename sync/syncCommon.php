@@ -17,7 +17,7 @@ function syncUpdateVersions($db, $lastServerVersion) {
    $stmt->execute(array("lastServerVersion" => $lastServerVersion));
 }
 
-function syncGetVersions($db) {
+function syncGetVersion($db) {
    $query = "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10);";
    $stmt = $db->query($query);
    return $stmt->fetchColumn();

@@ -18,7 +18,7 @@ function syncWithServer($db, $serverUrl, $requests) {
 
 //      syncIncrementVersion($db);
 
-      $curVersion = syncGetVersions($db);
+      $curVersion = syncGetVersion($db);
       $minVersion = 0; // TODO :: ???
       $maxVersion = $curVersion;
 
