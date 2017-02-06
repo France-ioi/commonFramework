@@ -18,7 +18,13 @@ function syncUpdateVersions($db, $lastServerVersion) {
 }
 
 function syncGetVersion($db) {
-   $query = "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10);";
+   global $config;
+   if(isset($config->db->fractionalTime) && $config->db->fractionalTime) {
+      $curVersionQuery = "ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10)";
+   } else {
+      $curVersionQuery = "(UNIX_TIMESTAMP() * 10)";
+   }
+   $query = "SELECT ".$curVersionQuery.";";
    $stmt = $db->query($query);
    return $stmt->fetchColumn();
 }

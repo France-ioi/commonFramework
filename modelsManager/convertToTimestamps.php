@@ -9,7 +9,12 @@ foreach ($tablesModels as $tableName => $tableModel) {
 	}
 	$stmt = $db->prepare('ALTER TABLE `'.$tableName.'` CHANGE `iVersion` `iVersion` BIGINT(20) NOT NULL;');
 	$stmt->execute();
-	$stmt = $db->prepare('SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10) INTO @curVersion; UPDATE `'.$tableName.'` SET `iVersion` = @curVersion;');
+    if(isset($config->db->fractionalTime) && $config->db->fractionalTime) {
+       $curVersionQuery = "ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10)";
+    } else {
+       $curVersionQuery = "(UNIX_TIMESTAMP() * 10)";
+    }
+	$stmt = $db->prepare('SELECT '.$curVersionQuery.' INTO @curVersion; UPDATE `'.$tableName.'` SET `iVersion` = @curVersion;');
 	$stmt->execute();
 	$stmt = $db->prepare("truncate history_$tableName;");
     $stmt->execute();

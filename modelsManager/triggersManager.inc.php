@@ -4,6 +4,8 @@ class TriggerManager {
    public static $debug = false;
 
    static function addVersionTriggers($tablesModels, &$triggers) {
+      global $config;
+
       foreach ($tablesModels as $tableName => $tableModel) {
          if (isset($tableModel["hasHistory"]) && ($tableModel["hasHistory"] == false)) {
             continue;
@@ -25,7 +27,13 @@ class TriggerManager {
             $listFieldsOldValues[] = "OLD.`".$fieldName."`";
          }
 
-         $triggers[$tableName]["BEFORE INSERT"][] = "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10) INTO @curVersion;".
+         if(isset($config->db->fractionalTime) && $config->db->fractionalTime) {
+            $curVersionQuery = "ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10)";
+         } else {
+            $curVersionQuery = "(UNIX_TIMESTAMP() * 10)";
+         }
+
+         $triggers[$tableName]["BEFORE INSERT"][] = "SELECT ".$curVersionQuery." INTO @curVersion;".
                                                   "SET NEW.iVersion = @curVersion";
 
          $triggers[$tableName]["AFTER INSERT"][] = "INSERT INTO `history_".$tableName."` (".implode(",", $listFields).") VALUES (".implode(",", $listFieldsNewValues).")";
@@ -34,7 +42,7 @@ class TriggerManager {
             "IF NEW.iVersion <> OLD.iVersion THEN ".
                "SET @curVersion = NEW.iVersion; ".
             "ELSE ".
-               "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10) INTO @curVersion; ".
+               "SELECT ".$curVersionQuery." INTO @curVersion; ".
             "END IF; ".
             "IF NOT (".$conditions.") THEN ".
             "  SET NEW.iVersion = @curVersion; ".
@@ -44,7 +52,7 @@ class TriggerManager {
             "; END IF";
 
          $triggers[$tableName]["BEFORE DELETE"][] =
-                  "SELECT ROUND(UNIX_TIMESTAMP(CURTIME(2)) * 10) INTO @curVersion; ".
+                  "SELECT ".$curVersionQuery." INTO @curVersion; ".
                   "UPDATE `history_".$tableName."` SET `iNextVersion` = @curVersion WHERE `".$idField."` = OLD.`".$idField."` AND `iNextVersion` IS NULL; ".
                   "INSERT INTO `history_".$tableName."` (".implode(",", $listFields).", `bDeleted`) ".
                      "VALUES (".implode(",", $listFieldsOldValues).", 1)";
