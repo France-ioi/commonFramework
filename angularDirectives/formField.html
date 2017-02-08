@@ -53,13 +53,13 @@
                   <input type="text" ng-model="model[fieldname].y" class="form-control">
                </div>
                <div class="col-xs-2">
-                 <button type="button" class="btn btn-default btn-block" ng-click="map.display = !map.display">Carte
+                 <button type="button" class="btn btn-default btn-block" ng-click="map.display = !map.display" ng-i18next="commonFramework:formfield_map">
                  </button>
                </div>
             </div>
             <div ng-if="map.display" class="row">
                <div class="col-xs-8 col-xs-offset-4">
-                  <a href="" ng-click="map.geocoder()">Déduire les coordonnées de l'adresse</a>
+                  <a href="" ng-click="map.geocoder()" ng-i18next="commonFramework:formfield_geocode"></a>
                </div>
                <google-map center="map.center" zoom="map.zoom" draggable="true" events="map.events">
                   <marker coords="[model[fieldname].y, model[fieldname].x]" ng-if="model[fieldname].x"></marker>
@@ -82,7 +82,7 @@
               <timepicker ng-model="model[fieldname]"></timepicker>
             </div>
             <div class="col-xs-2">
-              <button class="btn btn-danger" ng-click="clear()">Jamais</button>
+              <button class="btn btn-danger" ng-click="clear()" ng-i18next="commonFramework:never"></button>
             </div>
          </div>
 
@@ -105,7 +105,7 @@
               </p>
             </div>
             <div class="col-xs-3">
-              <button class="btn btn-danger" ng-click="clear()">Jamais</button>
+              <button class="btn btn-danger" ng-click="clear()" ng-i18next="commonFramework:never"></button>
             </div>
          </div>
 
@@ -114,7 +114,7 @@
             <div class="col-xs-8">
               <select ng-if="!readonly" ui-select2="select2Options" ng-model="model[fieldname]" class="form-control"
                       placeholder="Pays">
-                <option ng-if="field.nullInvalid !== true" ng-value="undefined">Aucun</option>
+                <option ng-if="field.nullInvalid !== true" ng-value="undefined" ng-i18next="commonFramework:none"></option>
                 <option ng-value="key" ng-repeat="(key, value) in field.values" ng-selected="model[fieldname] == key" ng-if="!value.asAdmin || user.admin">{{value.label}}</option>
               </select>
               <!--<select ng-if="!readonly" ng-model="model[fieldname]" class="form-control"-->

@@ -355,7 +355,7 @@ window.SyncQueue = {
          SyncQueue.dateLastSyncAttempt && (now.getTime() - SyncQueue.dateLastSyncAttempt.getTime() > 60 * 1000)) {
          SyncQueue.nbSyncAborted++;
          if (SyncQueue.nbSyncAborted == 2) {
-            SyncQueue.showAlert("Attention : l'application ne parvient pas à se connecter. Vos dernières modifications risquent de ne pas être enregistrées. Surveillez l'indicateur de connexion.");
+            SyncQueue.showAlert(i18next.t('commonFramework:connection_error_message'));
          }
          SyncQueue.status = SyncQueue.statusIdle;
       }
@@ -367,9 +367,9 @@ window.SyncQueue = {
       }
       SyncQueue.nbFailuresByType[failType]++;
       if (SyncQueue.nbFailures == 2) {
-         SyncQueue.showAlert("Attention : l'application ne parvient pas à se connecter. Vos dernières modifications risquent de ne pas être enregistrées. Surveillez l'indicateur de connexion.");
+         SyncQueue.showAlert(i18next.t('commonFramework:connection_error_message'));
       }
-      console.error("Echec " + SyncQueue.nbFailures + " : " + message);
+      console.error(i18next.t('commonFramework:failure') + " " + SyncQueue.nbFailures + " : " + message);
       if (retry) {
          SyncQueue.markStatus(SyncQueue.statusWillSend); // TODO: update
          SyncQueue.setStatus(SyncQueue.statusWillSend);
@@ -518,8 +518,8 @@ window.SyncQueue = {
                   }
                }
             } catch (exception) {
-               console.error("Attention, erreur de synchronisation, vos dernières modifications risquent de ne pas être enregistrées.\n" + exception.message + "\n" + exception.stack);
-               SyncQueue.syncFailed("Erreur de synchro", (numAttempt == SyncQueue.numLastAttempt), 2);
+               console.error(i18next.t('commonFramework:sync_error_message') + "\n" + exception.message + "\n" + exception.stack);
+               SyncQueue.syncFailed(i18next.t('commonFramework:sync_error'), (numAttempt == SyncQueue.numLastAttempt), 2);
             }
          },
          error: function(request, status, err) {

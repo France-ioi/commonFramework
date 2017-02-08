@@ -7,7 +7,15 @@ Libraries used in many France-ioi projects:
 * [bebras-platform](https://github.com/France-ioi/bebras-platform)
 * maybe others...?
 
-Contents:
+## Requirements
+
+* jQuery
+* i18next
+* angular and ng-i18next (for angularDirectives/formField)
+* dynatree (for treeview)
+* ...?
+
+## Contents
 
 * `modelsManager`: provides, server-side and client-side, models of the data in the database, for easy manipulation and update
 * `syncServer`: synchronises (incementally) data between the server and the clients, using the models from `modelsManager`

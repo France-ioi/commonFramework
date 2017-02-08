@@ -285,7 +285,7 @@ var TreeView = Class.extend({
       }
       this.relationsKeys[relationID].push(this.currentKey);
       if (depth > 50) {
-         alert("too deep ( " + depth + ") ! relationID : " + relationID);
+         alert(i18next.t('commonFramework:treeview_too_deep') + " (" + depth + ") ! relationID : " + relationID);
       }
       var children = childObject[this.childrenFieldName] || [];
       for (var iChild = 0; iChild < children.length; iChild++) {
@@ -365,24 +365,28 @@ var TreeView = Class.extend({
 
    deleteObjectFromNode: function(node) {
       if (!node) {
-         alert("Aucun objet sélectionné");
+         alert(i18next.t('commonFramework:treeview_no_object_selected'));
          return false;
       }
       if (node.parent == null) {
-         alert("Les objets à la racine ne peuvent être retirés");
+         alert(i18next.t('commonFramework:treeview_unable_remove_root'));
          return false;
       }
       if (node.data.idObject) {
-         alert("L'objet ne peut pas être retiré de cet endroit"); // TODO : don't show in contextMenu !
+         alert(i18next.t('commonFramework:treeview_unable_remove_there')); // TODO : don't show in contextMenu !
          return false;
       }
       var relation = ModelsManager.getRecord(this.relationsModelName, node.data.idRelation);
       if (!this.checkUserRight(relation.ID, this.relationsModelName, 'delete')) {
-         alert("Vous n'avez pas le droit de retirer cet objet"); // TODO : don't show in contextMenu !
+         alert(i18next.t('commonFramework:treeview_unable_remove_rights')); // TODO : don't show in contextMenu !
          return false;
       }
       var objectParent = relation[this.parentFieldName];
-      if (!confirm('Êtes-vous certain de vouloir retirer "' + this.getRelationTitle(relation, true) + '" de "' + this.getObjectTitle(objectParent, true) + '" ?')) {
+      var confirmMsg = i18next.t('commonFramework:treeview_confirm_remove')
+         + ' "' + this.getRelationTitle(relation, true) + '" '
+         + i18next.t('commonFramework:treeview_confirm_remove_from')
+         + ' "' + this.getObjectTitle(objectParent, true) + '" ?';
+      if (!confirm(confirmMsg)) {
          return false;
       }
       if (this.selectedRelationID == node.data.idRelation) {
@@ -405,7 +409,7 @@ var TreeView = Class.extend({
    pasteRelation: function(targetNode) {
       var relation = this.commonData.copiedRelation;
       if (relation == null) {
-         alert("Aucun object copié");
+         alert(i18next.t('commonFramework:treeview_no_object_copied'));
          return false;
       }
       var targetRelation = ModelsManager.getRecord(this.relationsModelName, targetNode.data.idRelation);
@@ -414,7 +418,7 @@ var TreeView = Class.extend({
       newRelation[this.idParentFieldName] = targetRelation[this.childFieldName].ID;
       newRelation[this.iChildOrderFieldName] = this.firstAvailableOrder(targetRelation[this.childFieldName]);
       ModelsManager.insertRecord(this.relationsModelName, newRelation);
-      alert("Vous avez déplacé/copié un item, les paramètres d'accès ont été remis à zéro. Veuillez les vérifier dans le panneau 'Accès et validation'.");
+      alert(i18next.t('commonFramework:treeview_warning_access'));
    },
 
    cleanupOrders: function(parentObject) {
@@ -529,7 +533,7 @@ var TreeView = Class.extend({
             this.relationCreated(newRelation);
          }
          ModelsManager.insertRecord(this.relationsModelName, newRelation);
-         alert("Vous avez déplacé/copié un item, les paramètres d'accès ont été remis à zéro. Veuillez les vérifier dans le panneau 'Accès et validation'.");
+         alert(i18next.t('commonFramework:treeview_warning_access'));
       }
    },
 
@@ -573,7 +577,7 @@ var TreeView = Class.extend({
 
    addSearchResults: function(objects) {
       var searchFolder = {
-         title: "Résultats de la recherche",
+         title: i18next.t('commonFramework:treeview_search_results'),
          isFolder: true,
          key: "search",
          children: [],
@@ -598,7 +602,7 @@ var TreeView = Class.extend({
 
    getUnusedFolder: function() {
       var unusedFolder = {
-         title: "Objets non utilisés",
+         title: i18next.t('commonFramework:treeview_unused_objects'),
          isFolder: true,
          key: "unused",
          children: [],
@@ -793,11 +797,11 @@ var TreeView = Class.extend({
             if (that.commonData.isDropping) {
                items = {
                   "drop_copy": {
-                     name: "Copier",
+                     name: i18next.t('commonFramework:copy'),
                      icon: "copy"
                   },
                   "drop_move": {
-                     name: "Déplacer",
+                     name: i18next.t('commonFramework:move'),
                      icon: "paste"
                   },
                };
@@ -805,30 +809,30 @@ var TreeView = Class.extend({
                if (node.data.idObject) {
                   items = {
                      "copy": {
-                        name: "Copier",
+                        name: i18next.t('commonFramework:copy'),
                         icon: "copy"
                      }
                   };
                } else {
                   items = {
                      "cut": {
-                        name: "Couper",
+                        name: i18next.t('commonFramework:cut'),
                         icon: "cut"
                      },
                      "copy": {
-                        name: "Copier",
+                        name: i18next.t('commonFramework:copy'),
                         icon: "copy"
                      },
                      "paste": {
-                        name: "Coller",
+                        name: i18next.t('commonFramework:paste'),
                         icon: "paste"
                      },
                      "delete": {
-                        name: "Retirer",
+                        name: i18next.t('commonFramework:remove'),
                         icon: "delete"
                      },
                      "create": {
-                        name: "Nouveau",
+                        name: i18next.t('commonFramework:new'),
                         icon: "edit"
                      }
                   };

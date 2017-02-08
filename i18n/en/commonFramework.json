@@ -1,0 +1,30 @@
+{
+    "connection_error_message": "Warning: unable to connect to the server. Your last modifications may not be saved. Please check your connection status.",
+    "failure": "Failure",
+    "sync_error": "Synchronization failure",
+    "sync_error_msg": "Warning, synchronization failure, your last modifications may not be saved.",
+
+    "formfield_map": "Map",
+    "formfield_geocode": "Find coordinates from address",
+    "never": "Never",
+    "none": "None",
+
+    "treeview_too_deep": "Too deep",
+    "treeview_no_object_selected": "No object selected",
+    "treeview_unable_remove_root": "Objects at the root cannot be removed",
+    "treeview_unable_remove_there": "This object cannot be removed from there",
+    "treeview_unable_remove_rights": "You don't have the right to remove this object",
+    "treeview_confirm_remove": "Are you sure you want to remove",
+    "treeview_confirm_remove_from": "from",
+    "treeview_no_object_copied": "No object copied",
+    "treeview_warning_access": "You have moved/copied an item, the access settings have been reset. Please check them in the 'Access and Validation' panel.",
+    "treeview_search_results": "Search results",
+    "treeview_unused_objects": "Unused objects",
+
+    "copy": "Copy",
+    "move": "Move",
+    "cut": "Cut",
+    "paste": "Paste",
+    "remove": "Remove",
+    "new": "New"
+}

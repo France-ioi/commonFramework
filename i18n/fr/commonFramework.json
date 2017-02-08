@@ -1,0 +1,30 @@
+{
+    "connection_error_message": "Attention : l'application ne parvient pas à se connecter. Vos dernières modifications risquent de ne pas être enregistrées. Surveillez l'indicateur de connexion.",
+    "failure": "Echec",
+    "sync_error": "Erreur de synchro",
+    "sync_error_msg": "Attention, erreur de synchronisation, vos dernières modifications risquent de ne pas être enregistrées.",
+
+    "formfield_map": "Carte",
+    "formfield_geocode": "Déduire les coordonnées de l'adresse",
+    "never": "Jamais",
+    "none": "Aucun",
+
+    "treeview_too_deep": "Trop de niveaux",
+    "treeview_no_object_selected": "Aucun objet sélectionné",
+    "treeview_unable_remove_root": "Les objets à la racine ne peuvent être retirés",
+    "treeview_unable_remove_there": "L'objet ne peut pas être retiré de cet endroit",
+    "treeview_unable_remove_rights": "Vous n'avez pas le droit de retirer cet objet",
+    "treeview_confirm_remove": "Êtes-vous certain de vouloir retirer",
+    "treeview_confirm_remove_from": "de",
+    "treeview_no_object_copied": "Aucun objet copié",
+    "treeview_warning_access": "Vous avez déplacé/copié un item, les paramètres d'accès ont été remis à zéro. Veuillez les vérifier dans le panneau 'Accès et validation'.",
+    "treeview_search_results": "Résultats de la recherche",
+    "treeview_unused_objects": "Objets non utilisés",
+
+    "copy": "Copier",
+    "move": "Déplacer",
+    "cut": "Couper",
+    "paste": "Coller",
+    "remove": "Retirer",
+    "new": "Nouveau"
+}
