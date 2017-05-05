@@ -674,9 +674,11 @@ function insertRows($db, $request, $roles) {
          error_log("execution failed");
       }
       if ($stmt->rowCount() == 0) {
-         error_log("nothing inserted ".json_encode($record));
-         error_log($query);
-         error_log(json_encode($values));
+         if(isset($config->sync->debug) && $config->sync->debug) {
+            error_log("nothing inserted ".json_encode($record));
+            error_log($query);
+            error_log(json_encode($values));
+         }
          $insertIDs[$key] = 0;
       } else {
          if (!hasAutoincrementID($viewModel) && $ID) {

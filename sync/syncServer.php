@@ -7,6 +7,10 @@ require_once __DIR__."/syncCommon.php";
 require_once __DIR__."/../../shared/connect.php";
 require_once __DIR__."/../../shared/syncRequests.php";
 
+if(isset($config->sync->memLimit) && $config->sync->memLimit != '') {
+   ini_set('memory_limit', $config->sync->memLimit);
+}
+
 syncDebug('Synchro', 'begin');
 if (session_status() === PHP_SESSION_NONE){session_start();}
 
