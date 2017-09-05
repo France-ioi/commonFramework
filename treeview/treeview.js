@@ -26,6 +26,7 @@ var TreeView = Class.extend({
       this.iChildOrderFieldName = params.iChildOrderFieldName;
       this.parentsFieldName = params.parentsFieldName;
       this.childrenFieldName = params.childrenFieldName;
+      this.childrenFixedRanksName = params.childrenFixedRanksName;
       this.forceRoot = params.isObjectRoot;
       this.isObjectRoot = params.isObjectRoot;
       this.getObjectTitle = params.getObjectTitle;
@@ -422,6 +423,9 @@ var TreeView = Class.extend({
    },
 
    cleanupOrders: function(parentObject) {
+      if(this.childrenFixedRanksName && parentObject[this.childrenFixedRanksName]) {
+         return;
+      }
       var childrenIDsSorted = [];
       var children = parentObject[this.childrenFieldName];
       var that = this;
@@ -447,6 +451,11 @@ var TreeView = Class.extend({
 
    firstAvailableOrder: function(parentObject) {
       var firstAvailable;
+      if (this.childrenFixedRanksName && parentObject[this.childrenFixedRanksName]) {
+         // Object has fixed ranks for the children, all new children are
+         // assigned 0 as rank
+         return 0;
+      }
       if (typeof parentObject[this.childrenFieldName] === 'object') {
          firstAvailable = Object.keys(parentObject[this.childrenFieldName]).length;
       } else {
@@ -456,6 +465,9 @@ var TreeView = Class.extend({
    },
 
    changeChildrenOrderBetween: function(object, delta, beginOrder, endOrder) {
+      if(this.childrenFixedRanksName && object[this.childrenFixedRanksName]) {
+         return;
+      }
       var that = this;
       var children = object[this.childrenFieldName];
       var maxOrder = 0;
