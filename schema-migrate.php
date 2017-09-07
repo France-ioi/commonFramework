@@ -12,7 +12,7 @@ schema/migrate.php start
 
 Note: 2 and 3 just setting current revision pointer, without executing sql
 */
-require_once("../shared/connect.php");
+require_once(__DIR__."/../shared/connect.php");
 
 
 $migrator = new Migrator($db);
