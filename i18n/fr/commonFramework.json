@@ -1,5 +1,8 @@
 {
     "connection_error_message": "Attention : l'application ne parvient pas à se connecter. Vos dernières modifications risquent de ne pas être enregistrées. Surveillez l'indicateur de connexion.",
+    "connection_error_counter": "Will try again in",
+    "connection_error_counter_secs": "seconds.",
+    "connection_error_try_now": "Try now",
     "failure": "Echec",
     "sync_error": "Erreur de synchro",
     "sync_error_msg": "Attention, erreur de synchronisation, vos dernières modifications risquent de ne pas être enregistrées.",

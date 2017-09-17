@@ -19,7 +19,7 @@ function logError(details) {
    $.post(rootUrl + "sync/jsErrors.php", {"details": details},
       function(data, textStatus) {
       }
-   ); 
+   );
 }
 
 window.onerror = function(message, file, line) {
@@ -27,6 +27,7 @@ window.onerror = function(message, file, line) {
 };
 
 // TODO: this doesn't work anymore with angular > 1.3, provide a real module
+/*
 window.SyncCtrl = function($scope, $timeout) {
    $scope.syncStatus = function() {
       var params = [];
@@ -86,7 +87,7 @@ window.SyncCtrl = function($scope, $timeout) {
    $scope.lastPingStart = null;
    $scope.lastPingEnd = null;
    $scope.pingStatus = "";
-   $scope.showDetails = false;
+   $scope.showDetails = true;//showDetails;
    $scope.syncQueue = SyncQueue;
    $scope.nbSoundTests = 0;
    $scope.lastExecTime = "";
@@ -98,6 +99,89 @@ window.SyncCtrl = function($scope, $timeout) {
       //$scope.$apply()
     });
 }
+*/
+
+
+window.SyncAlert = {
+
+    element: null,
+    interval: null,
+    time_counter: 0,
+    hide_timeout: null,
+    element: null,
+
+
+    show: function(next_attempt_delay) {
+        this.reset();
+        if(next_attempt_delay) {
+            this.time_counter = next_attempt_delay;
+            this.interval = setInterval(this.refreshCounter.bind(this), 1000);
+        } else {
+            this.time_counter = false;
+        }
+        this.display(this.time_counter);
+        this.getElement().show();
+    },
+
+
+    refreshCounter: function() {
+        this.time_counter--;
+        if(this.time_counter) {
+            this.display(this.time_counter);
+        } else {
+            this.reset();
+            this.hide_timeout = setTimeout(this.hide.bind(this), 100);
+        }
+
+    },
+
+
+    hide: function() {
+        this.reset();
+        this.getElement().hide();
+    },
+
+
+    reset: function() {
+        clearTimeout(this.hide_timeout);
+        clearInterval(this.interval);
+    },
+
+
+    display: function(time_counter) {
+        this.getElement().find('.counter').toggle(time_counter && time_counter > 0).find('.secs').html(time_counter);
+    },
+
+
+    getElement: function() {
+        if(!this.element) {
+            this.element = $(
+                '<div class="sync-alert">' +
+                    '<div class="message">' + i18next.t('commonFramework:connection_error_message') + '</div>' +
+                    '<span class="counter">' +
+                        i18next.t('commonFramework:connection_error_counter') +
+                        ' <span class="secs"></span> ' +
+                        i18next.t('commonFramework:connection_error_counter_secs') +
+                    '</span> ' +
+                    '<a href="#">' + i18next.t('commonFramework:connection_error_try_now') + '</a>' +
+                '</div>'
+            )
+            $(document.body).append(this.element);
+            this.element.find('a').click(this.tryNow.bind(this));
+        }
+        return this.element;
+    },
+
+
+    tryNow: function(e) {
+        e.preventDefault();
+        window.SyncQueue.resetScheduleSync();
+        window.SyncQueue.sync();
+        this.hide();
+    }
+
+}
+
 
 window.SyncQueue = {
    modelsManager: null,
@@ -135,9 +219,7 @@ window.SyncQueue = {
    actionDelete: 3,
 
    objectsToSync: {},
-   showAlert: function(message) {
-      alert(message);
-   },
+   schedule_sync_timeout: null,
 
    setStatus: function(status) {
       this.status = status;
@@ -152,10 +234,6 @@ window.SyncQueue = {
          this.objectsToSync[modelName] = {};
       }
       this.initErrorHandler();
-   },
-
-   setShowAlert: function(showAlert) {
-      this.showAlert = showAlert;
    },
 
    addSyncStartListeners: function(name, listener) {
@@ -355,7 +433,8 @@ window.SyncQueue = {
          SyncQueue.dateLastSyncAttempt && (now.getTime() - SyncQueue.dateLastSyncAttempt.getTime() > 60 * 1000)) {
          SyncQueue.nbSyncAborted++;
          if (SyncQueue.nbSyncAborted == 2) {
-            SyncQueue.showAlert(i18next.t('commonFramework:connection_error_message'));
+            //SyncQueue.showAlert(i18next.t('commonFramework:connection_error_message'));
+            SyncAlert.show();
          }
          SyncQueue.status = SyncQueue.statusIdle;
       }
@@ -366,18 +445,33 @@ window.SyncQueue = {
          SyncQueue.nbFailures++;
       }
       SyncQueue.nbFailuresByType[failType]++;
+      /*
       if (SyncQueue.nbFailures == 2) {
          SyncQueue.showAlert(i18next.t('commonFramework:connection_error_message'));
       }
+      */
       console.error(i18next.t('commonFramework:failure') + " " + SyncQueue.nbFailures + " : " + message);
+      var delay = false;
       if (retry) {
          SyncQueue.markStatus(SyncQueue.statusWillSend); // TODO: update
          SyncQueue.setStatus(SyncQueue.statusWillSend);
-         var delay = Math.min(SyncQueue.nbFailures, 30);
+         delay = Math.min(SyncQueue.nbFailures, 30);
          delay = Math.max(5, delay);
-         setTimeout(SyncQueue.sync, 1000 * delay);
+         SyncQueue.scheduleSync(delay);
       }
+      SyncAlert.show(delay);
    },
+
+
+    scheduleSync: function(delay) {
+        this.schedule_sync_timeout = setTimeout(SyncQueue.sync, 1000 * delay);
+    },
+
+
+    resetScheduleSync: function() {
+        clearTimeout(this.schedule_sync_timeout);
+    },
+
 
    sync: function(callback) {
       if ((SyncQueue.status == SyncQueue.statusSending) || (SyncQueue.status == SyncQueue.statusSendingWillSend)) {
@@ -483,7 +577,7 @@ window.SyncQueue = {
                SyncQueue.nbFailures = 0;
                SyncQueue.clearStatus();
                if ((SyncQueue.status === SyncQueue.statusSendingWillSend) || data.continued) {
-                  setTimeout(SyncQueue.sync, 1000);
+                  SyncQueue.scheduleSync(1);
                   SyncQueue.setStatus(SyncQueue.statusWillSend);
                   if (SyncQueue.debugMode) {
                      console.log("back to willSend");

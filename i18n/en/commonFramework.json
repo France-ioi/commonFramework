@@ -1,5 +1,8 @@
 {
     "connection_error_message": "Warning: unable to connect to the server. Your last modifications may not be saved. Please check your connection status.",
+    "connection_error_counter": "Will try again in",
+    "connection_error_counter_secs": "seconds.",
+    "connection_error_try_now": "Try now",
     "failure": "Failure",
     "sync_error": "Synchronization failure",
     "sync_error_msg": "Warning, synchronization failure, your last modifications may not be saved.",
