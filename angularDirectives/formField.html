@@ -26,6 +26,7 @@
             <div class="col-xs-8">
               <input type="text" ng-model="model[fieldname]" class="form-control">
             </div>
+            <div ng-if="compare && compare[fieldname]" class="col-xs-8 col-xs-push-4"><i>{{ compare.language.sName}} : {{ compare[fieldname] }}</i></div>
          </div>
 
          <div ng-switch-when="text" class="form-group row">
@@ -33,6 +34,7 @@
             <div class="col-xs-8">
               <textarea class="form-control" rows="5" ng-model="model[fieldname]"></textarea>
             </div>
+            <div ng-if="compare && compare[fieldname]" class="col-xs-8 col-xs-push-4"><i>{{ compare.language.sName}} : {{ compare[fieldname] }}</i></div>
          </div>
 
          <div ng-switch-when="boolean" class="form-group row">
