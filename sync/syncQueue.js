@@ -228,6 +228,10 @@ window.SyncQueue = {
       }
    },
 
+   setShowAlert: function(showAlert) {
+        this.showAlert = showAlert;
+   },
+
    init: function(modelsManager) {
       this.modelsManager = modelsManager;
       for (var modelName in this.modelsManager.models) {
