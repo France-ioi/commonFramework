@@ -616,7 +616,7 @@ window.SyncQueue = {
                   }
                }
             } catch (exception) {
-               console.error(i18next.t('commonFramework:sync_error_message') + "\n" + exception.message + "\n" + exception.stack);
+               console.error(i18next.t('commonFramework:sync_error_msg') + "\n" + exception.message + "\n" + exception.stack);
                SyncQueue.syncFailed(i18next.t('commonFramework:sync_error'), (numAttempt == SyncQueue.numLastAttempt), 2);
             }
          },
