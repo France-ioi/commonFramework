@@ -259,13 +259,9 @@ var TreeView = Class.extend({
       };
    },
 
-   getRelationTitle: function(relation, removeTags) {
-      var title = this.getObjectTitle(relation[this.childFieldName], relation);
+   getRelationTitle: function(relation, noHtml) {
+      var title = this.getObjectTitle(relation[this.childFieldName], relation, noHtml);
       var res = relation[this.iChildOrderFieldName] + ": " + title;
-      if (removeTags) {
-         res = res.replace(/<(?:.|\n)*?>/gm, '');
-         res = res.replace(/\[(?:.|\n)*?\]/gm, '');
-      }
       return res;
    },
 
@@ -386,7 +382,7 @@ var TreeView = Class.extend({
       var confirmMsg = i18next.t('commonFramework:treeview_confirm_remove')
          + ' "' + this.getRelationTitle(relation, true) + '" '
          + i18next.t('commonFramework:treeview_confirm_remove_from')
-         + ' "' + this.getObjectTitle(objectParent, true) + '" ?';
+         + ' "' + this.getObjectTitle(objectParent, true, true) + '" ?';
       if (!confirm(confirmMsg)) {
          return false;
       }
@@ -509,23 +505,25 @@ var TreeView = Class.extend({
       console.error(res);
    },
 
-   addObjectToTargetNode: function(object, targetRelation, hitMode, relation) {
-      if(relation && relation[this.parentFieldName].ID === targetRelation[this.parentFieldName].ID) {
-         if (hitMode === "over") {
-            relation[this.iChildOrderFieldName] = this.firstAvailableOrder(targetRelation[this.childFieldName]);
-         } else {
-            var iChildOrder = targetRelation[this.iChildOrderFieldName];
-            if (hitMode == "after") {
-               iChildOrder++;
-            }
-            this.changeChildrenOrderBetween(targetRelation[this.parentFieldName], 1, iChildOrder);
-            relation[this.iChildOrderFieldName] = iChildOrder;
+   addObjectToTargetNode: function(object, targetRelation, hitMode, relation, action) {
+      if(relation && relation[this.parentFieldName].ID === targetRelation[this.childFieldName].ID && hitMode == 'over') {
+         // Do nothing, we just dragged an item over its parent
+         return;
+      }
+      if(relation && relation[this.parentFieldName].ID === targetRelation[this.parentFieldName].ID && hitMode != "over") {
+         // Reordering an item among its siblings
+         var iChildOrder = targetRelation[this.iChildOrderFieldName];
+         if (hitMode == "after") {
+            iChildOrder++;
          }
+         this.changeChildrenOrderBetween(targetRelation[this.parentFieldName], 1, iChildOrder);
+         relation[this.iChildOrderFieldName] = iChildOrder;
          ModelsManager.updated(this.relationsModelName, relation.ID);
          if (this.relationCreated != undefined) {
             this.relationCreated(relation);
          }
       } else {
+         // Actually copying/moving items
          var newRelation = ModelsManager.createRecord(this.relationsModelName);
          newRelation[this.idChildFieldName] = object.ID;
          if (hitMode === "over") {
@@ -545,6 +543,11 @@ var TreeView = Class.extend({
             this.relationCreated(newRelation);
          }
          ModelsManager.insertRecord(this.relationsModelName, newRelation);
+         if(action == 'drop_move') {
+            // We created a new relation to represent the old one we're moving,
+            // delete the old one
+            this.doDeleteRelation(relation);
+         }
          alert(i18next.t('commonFramework:treeview_warning_access'));
       }
    },
@@ -553,10 +556,7 @@ var TreeView = Class.extend({
       //logMsg("tree.onDrop(%o, %o, %s)", node, sourceNode, hitMode);
       var relation = ModelsManager.getRecord(this.relationsModelName, sourceNode.data.idRelation);
       var targetRelation = ModelsManager.getRecord(this.relationsModelName, targetNode.data.idRelation);
-      this.addObjectToTargetNode(relation[this.childFieldName], targetRelation, hitMode, relation);
-      if (action == "drop_move" && relation[this.parentFieldName].ID !== targetRelation[this.parentFieldName].ID) {
-         this.doDeleteRelation(relation);
-      }
+      this.addObjectToTargetNode(relation[this.childFieldName], targetRelation, hitMode, relation, action);
       return true;
    },
 
