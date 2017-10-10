@@ -104,7 +104,6 @@ window.SyncCtrl = function($scope, $timeout) {
 
 window.SyncAlert = {
 
-    element: null,
     interval: null,
     time_counter: 0,
     hide_timeout: null,
