@@ -351,7 +351,7 @@ function getSelectQuery($request, $joinsMode) {
       $sqlFieldsSelect = "count(DISTINCT `".$viewModel["mainTable"]."`.`".$ID."`) as `nbItems`";
    } else {
       $fieldsSelect = getFieldsSelect($request);
-      $sqlFieldsSelect = "`".$viewModel["mainTable"]."`.`".$ID."`, ".implode($fieldsSelect, ", ");
+      $sqlFieldsSelect = "DISTINCT `".$viewModel["mainTable"]."`.`".$ID."`, ".implode($fieldsSelect, ", ");
    }
 
    if ($sqlFieldsSelect == '') {
