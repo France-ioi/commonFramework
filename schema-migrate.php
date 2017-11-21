@@ -2,13 +2,14 @@
 /*
 it can be used in 3 ways:
 1. fresh install
-    run full_schema.sql then run migrate.php
+import full_schema.sql to DB, then run
+>schema-migrate.php
 
 2. if some revisions already installed, for example "1.1/revison-001" and "1.1/revision-002" installed and you want to use migration script from "1.1/revision-003"
-    migrate.php start "1.1/revision-003"
+>schema-migrate.php start "1.1/revision-003"
 
 3. all revisions installed:
-schema/migrate.php start
+>schema-migrate.php start
 
 Note: 2 and 3 just setting current revision pointer, without executing sql
 */
