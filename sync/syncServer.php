@@ -133,10 +133,10 @@ function syncWithClient($db, $clientChanges, $minServerVersion, $requests, $role
       $db->exec("COMMIT");
    }
 
-    // We remove the 1 added to curVersion here; no need to remove it if only a partial sync was done.
-    if($maxVersion == $curVersion) {
-        $maxVersion -= 1;
-    }
+   // We remove the 1 added to curVersion here; no need to remove it if only a partial sync was done.
+   if($maxVersion == $curVersion) {
+      $maxVersion -= 1;
+   }
 
    $execTime = (microtime(true) - $startTime) * 1000;
    echo "{";
