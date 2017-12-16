@@ -94,9 +94,11 @@ function syncWithClient($db, $clientChanges, $minServerVersion, $requests, $role
    // Applying changes before detecting changes mans that the changes coming from a client will be re-sent to it.
    // This is necessary because some of the changes may affect other records, that enter or leave the scope during the same version.
    // Listeners and triggers may also generate new changes that need to be sent to the client.
-   
-   // We save the current version, which will be used as the next minVersion when the same client synchronizes in the future. 
-   $curVersion = syncGetVersion($db);
+
+   // We save the current version, which will be used as the next minVersion when the same client synchronizes in the future.
+   // We add 1 as a safety in case changes were just made, as items created with version = maxVersion are excluded from this sync. It is removed later.
+   // It means that changes that occurred right now will be re-sent to the client on next sync, but it's impossible to do without.
+   $curVersion = syncGetVersion($db) + 1;
 
    $bsearchTimes = array();
    $maxVersion = $curVersion;
@@ -130,6 +132,12 @@ function syncWithClient($db, $clientChanges, $minServerVersion, $requests, $role
    if ($useTransaction) {
       $db->exec("COMMIT");
    }
+
+    // We remove the 1 added to curVersion here; no need to remove it if only a partial sync was done.
+    if($maxVersion == $curVersion) {
+        $maxVersion -= 1;
+    }
+
    $execTime = (microtime(true) - $startTime) * 1000;
    echo "{";
    echo  "\"changes\":".json_encode_safe($serverChanges).",";
