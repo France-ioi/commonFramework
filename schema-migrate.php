@@ -55,6 +55,7 @@ class Migrator {
             if($this->sql_executer->execute($sql)) {
                 $this->logger->append($file);
             } else return;
+            $this->output->info('Executed');
         }
         $this->output->info('All done.');
     }
