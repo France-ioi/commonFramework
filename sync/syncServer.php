@@ -34,21 +34,28 @@ function clientSentIdenticalRecord($recordID, & $serverRecord, & $modelClientCha
 }
 
 function removeModelBackfiredChanges($modelName, & $modelServerChanges, & $modelClientChanges) {
-   foreach ($modelServerChanges["deleted"] as $recordID => $value) {
-      if (isset($modelClientChanges["deleted"][$recordID])) {
-         unset($modelServerChanges["deleted"][$recordID]);
-      }
-   }
-   foreach ($modelServerChanges["inserted"] as $recordID => $serverRecord) {
-      if (clientSentIdenticalRecord($recordID, $serverRecord, $modelClientChanges)) {
-         unset($modelServerChanges["inserted"][$recordID]);
-      }
-   }
-   foreach ($modelServerChanges["updated"] as $recordID => $serverRecord) {
-      if (clientSentIdenticalRecord($recordID, $serverRecord, $modelClientChanges)) {
-         unset($modelServerChanges["updated"][$recordID]);
-      }
-   }
+    if(isset($modelServerChanges["deleted"])) {
+        foreach ($modelServerChanges["deleted"] as $recordID => $value) {
+            if (isset($modelClientChanges["deleted"][$recordID])) {
+               unset($modelServerChanges["deleted"][$recordID]);
+            }
+         }
+    }
+
+    if(isset($modelServerChanges["inserted"])) {
+        foreach ($modelServerChanges["inserted"] as $recordID => $serverRecord) {
+            if (clientSentIdenticalRecord($recordID, $serverRecord, $modelClientChanges)) {
+                unset($modelServerChanges["inserted"][$recordID]);
+            }
+        }
+    }
+    if(isset($modelServerChanges["updated"])) {
+        foreach ($modelServerChanges["updated"] as $recordID => $serverRecord) {
+            if (clientSentIdenticalRecord($recordID, $serverRecord, $modelClientChanges)) {
+                unset($modelServerChanges["updated"][$recordID]);
+            }
+        }
+    }
 }
 
 // We don't want to send records to the client that are exactly what the client sent us, so
