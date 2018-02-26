@@ -272,6 +272,7 @@ window.ModelsManager = {
       }
    },
    hasRecordChanged: function(modelName, ID) {
+      if(!this.initDone) { return true; }
       var model = this.models[modelName];
       var oldRecord = this.oldData[modelName][ID];
       var curRecord = this.curData[modelName][ID];
