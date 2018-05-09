@@ -665,7 +665,7 @@ var TreeView = Class.extend({
          ModelsManager.addListener(this.objectsStringsModelName, "updated", this.name, this.triggers.objectStringsUpdated, true);
       }
    },
- 
+
    fillTree: function() {
       if (!this.staticData) {
          this.addListeners();
@@ -801,7 +801,7 @@ var TreeView = Class.extend({
       $.contextMenu({
          selector: "#" + this.name + " .dynatree-node",
          build: function($trigger) {
-            var node = $.ui.dynatree.getNode($trigger);
+            var node = $.ui.dynatree.getNode($trigger[0]);
             var items;
             if ((node.data.key == "unused") || (node.data.key == "search")) {
                return false;
@@ -852,7 +852,7 @@ var TreeView = Class.extend({
             }
             return {
                callback: function(key, options) {
-                  var node = $.ui.dynatree.getNode($(this));
+                  var node = $.ui.dynatree.getNode($trigger[0]);
 
                   switch (key) {
                      case "delete":
