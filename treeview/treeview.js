@@ -2,7 +2,7 @@
 
 // depends on jQuery, jquery-dynatree, shared/utils.js and optionnaly jquery-contextmenu
 
-var TreeView = Class.extend({
+window.TreeView = Class.extend({
    init: function(name, commonData, params) {
       this.commonData = commonData;
       this.currentKey = 0;
