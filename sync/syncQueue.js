@@ -239,6 +239,14 @@ window.SyncQueue = {
       this.initErrorHandler();
    },
 
+   ajax: function(params) {
+      if(!params.data) { params.data = {}; }
+      if(window.phpsessid) {
+         params.data['PHPSESSID'] = window.phpsessid;
+      }
+      return $.ajax(params);
+   },
+
    addSyncStartListeners: function(name, listener) {
       this.syncStartListeners[name] = listener;
    },
@@ -543,7 +551,7 @@ window.SyncQueue = {
       }
       SyncQueue.dateLastSyncAttempt = ModelsManager.now();
       SyncQueue.lastExecTime = "";
-      $.ajax({
+      SyncQueue.ajax({
          type: "POST",
          url: rootUrl + "sync/syncServer.php",
          data: {

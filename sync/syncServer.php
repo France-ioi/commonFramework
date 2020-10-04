@@ -12,6 +12,9 @@ if(isset($config->sync->memLimit) && $config->sync->memLimit != '') {
 }
 
 syncDebug('Synchro', 'begin');
+if(isset($_POST['PHPSESSID'])) {
+    session_id($_POST['PHPSESSID']);
+}
 if (session_status() === PHP_SESSION_NONE){session_start();}
 
 function clientSentIdenticalRecord($recordID, & $serverRecord, & $modelClientChanges) {
