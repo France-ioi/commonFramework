@@ -191,18 +191,22 @@ function getSqlJoinsFromUsed($viewModel, $joinsUsed, $aliasPrefix = "") {
       if (!isset($joinsUsed[$joinName])) {
          continue;
       }
-      $dstTable = getDstTable($joinName, $join);
-      if (isset($join["type"]) && ($join["type"] == "LEFT")) {
-         $sqlJoins .= " LEFT";
-      }
-      if (isset($join['on'])) {
-         $joinOn = str_replace("[PREFIX]", $aliasPrefix, $join["on"]);
-         $sqlJoins .= " JOIN `".$dstTable."` AS `".$aliasPrefix.$joinName."` ON (".
-            $joinOn.")";
+      if (isset($join["sql"])) {
+         $sqlJoins .= " JOIN ".str_replace("[PREFIX]", $aliasPrefix, $join["sql"])." AS ".$aliasPrefix.$joinName." ";
       } else {
-         $sqlJoins .= " JOIN `".$dstTable."` AS `".$aliasPrefix.$joinName."` ON (".
-            "`".$aliasPrefix.$join["srcTable"]."`.`".$join["srcField"]."` = ".
-            "`".$aliasPrefix.$joinName."`.`".$join["dstField"]."`) ";
+         $dstTable = getDstTable($joinName, $join);
+         if (isset($join["type"]) && ($join["type"] == "LEFT")) {
+            $sqlJoins .= " LEFT";
+         }
+         if (isset($join['on'])) {
+            $joinOn = str_replace("[PREFIX]", $aliasPrefix, $join["on"]);
+            $sqlJoins .= " JOIN `".$dstTable."` AS `".$aliasPrefix.$joinName."` ON (".
+               $joinOn.")";
+         } else {
+            $sqlJoins .= " JOIN `".$dstTable."` AS `".$aliasPrefix.$joinName."` ON (".
+               "`".$aliasPrefix.$join["srcTable"]."`.`".$join["srcField"]."` = ".
+               "`".$aliasPrefix.$joinName."`.`".$join["dstField"]."`) ";
+         }
       }
    }
    return $sqlJoins;
