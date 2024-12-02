@@ -58,7 +58,11 @@ function sqlGreatest($expressions) {
 }
 
 function getRandomID() {
-   $rand = (string) mt_rand(100000, 999999999);
-   $rand .= (string) mt_rand(1000000, 999999999);
+   $bytes = openssl_random_pseudo_bytes(4);
+   $i = abs(unpack('N', $bytes)[1]);
+   $rand = (string) ($i % 999899999 + 100000);
+   $bytes = openssl_random_pseudo_bytes(4);
+   $i = abs(unpack('N', $bytes)[1]);
+   $rand .= (string) ($i % 998999999 + 1000000);
    return $rand;
 }
