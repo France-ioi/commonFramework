@@ -48,6 +48,21 @@ function getFieldType($viewModel, $fieldAlias) {
    return $tableModel["fields"][$fieldName]["type"];
 }
 
+function getFieldStrict($viewModel, $fieldAlias) {
+   $tableName = getFieldTable($viewModel, $fieldAlias);
+   if (!$tableName) { return false; }
+   $field = $viewModel["fields"][$fieldAlias];
+   if (isset($field["strict"])) {
+      return $field["strict"];
+   }
+   $tableModel = getTableModel($tableName);
+   $fieldName = getFieldName($viewModel, $fieldAlias);
+   if (!isset($tableModel["fields"][$fieldName])) {
+      return false;
+   }
+   return isset($tableModel["fields"][$fieldName]["strict"]) ? $tableModel["fields"][$fieldName]["strict"] : false;
+}
+
 function sqlGreatest($expressions) {
    if (!count($expressions)) {
       return '';
